@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, TouchableHighLight, Button } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, TouchableHighlight, Button } from 'react-native';
 import {StackNavigator} from 'react-navigation';
+
+
 
 class IntroductionScreen extends React.Component {
   static navigationOptions = {
     title: '¿Qué es el IMC?',
-
     headerStyle: {
         backgroundColor: '#e74c3c',
         marginTop: Expo.Constants.statusBarHeight
@@ -34,7 +35,7 @@ class IntroductionScreen extends React.Component {
         </Text>
         <View style={styles.footer}>
           <TouchableOpacity onPress= { ()=> navigate('Calculate') } style={styles.button}>
-              <Text style={styles.buttonText}>Calcular IMC</Text>
+              <Text style={styles.buttonTextFooter}>Calcular IMC</Text>
           </TouchableOpacity>
         </View>
       </Image>
@@ -43,6 +44,20 @@ class IntroductionScreen extends React.Component {
 }
 
 class CalculateScreen extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {peso: '', altura: '', imc: 0};
+  }
+
+  calculateSum = () => {
+    const { peso, altura } = this.state;
+
+    this.setState({
+      imc: (Number(peso) / (Number(altura)*Number(altura))) * 10000
+    });
+  }
+
   static navigationOptions = {
     title: 'Calcular IMC',
     headerTintColor: 'white',
@@ -59,36 +74,55 @@ class CalculateScreen extends React.Component {
     const { navigate } = this.props.navigation;
     return(
       <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
-
-      
+      <KeyboardAvoidingView behavior= 'padding' style= {styles.wrapper}>
 
         <View style={styles.textNumberContainer}>
           <TouchableOpacity style= {styles.buttonContainer}>
-            <Text style= {styles.buttonText1}>Peso : </Text>
+            <Text style= {styles.buttonText}>Peso (kg) : </Text>
           </TouchableOpacity>
-          <View style= {styles.border}></View>
-          <TextInput style= {styles.input} underlineColorAndroid='transparent' keyboardType="numeric"></TextInput>
+          <TextInput
+            style= {styles.input}
+            underlineColorAndroid='transparent'
+            placeholder= 'Peso'
+            keyboardType="numeric"
+            value= {this.state.peso}
+            onChangeText= {(peso) => this.setState({peso})}
+          />
         </View>
 
         <View style={styles.textNumberContainer}>
           <TouchableOpacity style= {styles.buttonContainer}>
-            <Text style= {styles.buttonText1}>Altura: </Text>
+            <Text style= {styles.buttonText}>Altura (cm): </Text>
           </TouchableOpacity>
-          <View style= {styles.border}></View>
-          <TextInput style= {styles.input} underlineColorAndroid='transparent'  keyboardType="numeric"></TextInput>
+          <TextInput
+            style= {styles.input}
+            underlineColorAndroid='transparent'
+            placeholder= 'Altura'
+            keyboardType="numeric"
+            value={this.state.altura}
+            onChangeText={(altura) => this.setState({altura})}
+          />
         </View>
 
-        <View style={styles.textNumberContainer}>
+        <View style={styles.btnCalculateContainer}>
+          <TouchableHighlight onPress={this.calculateSum} style={styles.buttonCalculate}>
+            <Text style={styles.buttonTextCalculate}>Calcular</Text>
+          </TouchableHighlight>
+        </View>
+
+         <View style={styles.textNumberContainer}>
           <TouchableOpacity style= {styles.buttonContainer}>
-            <Text style= {styles.buttonText1}>IMC : </Text>
+            <Text style= {styles.buttonText}>IMC : </Text>
           </TouchableOpacity>
           <View style= {styles.border}></View>
-          <TextInput style= {styles.input} underlineColorAndroid='transparent'  editable={false} ></TextInput>
+          <Text>{this.state.imc}</Text>
         </View>
+
+      </KeyboardAvoidingView>
 
         <View style= {styles.footer}>
-          <TouchableOpacity onPress= { ()=> navigate('Result') } style={styles.button}>
-            <Text style={styles.buttonText}>Ver Tabla</Text>
+          <TouchableOpacity onPress= { ()=> navigate('Result') } style={styles.buttonResult}>
+            <Text style={styles.buttonTextFooter}>Resultados</Text>
           </TouchableOpacity>
         </View>
 
@@ -116,7 +150,7 @@ class ResultScreen extends React.Component {
     <Image style= { styles.imgContainer} source= {require('./src/img/kiwi.jpg')}>
         <TouchableOpacity onPress= { ()=> navigate('Result') }>
           <View style={styles.button}>
-            <Text style={styles.buttonText}>Go Table</Text>
+            <Text style={styles.buttonTextFooter}>Go Table</Text>
           </View>
         </TouchableOpacity>
       </Image>
@@ -141,12 +175,16 @@ const NavigationApp = StackNavigator({
 export default class App extends React.Component {
   render() {
     return (
-      <NavigationApp />
+        <NavigationApp />
     );
   }
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    marginTop: 40
+  },
   imgContainer: {
     flex: 1,
     width: undefined,
@@ -157,7 +195,7 @@ const styles = StyleSheet.create({
   },
   textNumberContainer: {
     backgroundColor: 'white',
-    width: '90%',
+    width: '70%',
     height: 48,
     borderRadius: 4,
     flexDirection: 'row',
@@ -166,11 +204,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 40
   },
-  buttonText1:{
+  buttonText:{
     fontWeight: '600',
     fontSize: 20,
     paddingHorizontal: 16,
     color: 'black'
+  },
+  placeholder: {
+    fontSize: 10,
   },
   buttonContainer: {
     height: 48,
@@ -189,7 +230,6 @@ const styles = StyleSheet.create({
     height: 48,
     flex: 1,
     fontSize: 18,
-    paddingHorizontal: 8,
     color: 'black'
   },
   text: {
@@ -217,9 +257,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10
   },
-  buttonText: {
+  buttonTextFooter: {
     padding: 20,
     color: '#ecf0f1',
     textAlign: 'center'
+  },
+  btnCalculateContainer:{
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 30
+  },
+  buttonCalculate: {
+    backgroundColor: '#e74c3c',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+  },
+  buttonTextCalculate:{
+    padding: 20,
+    color: '#ecf0f1',
+    textAlign: 'center'
+  },
+  buttonResult: {
+    backgroundColor: '#e74c3c',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginBottom: 20
   }
 });
