@@ -44,20 +44,16 @@ class IntroductionScreen extends React.Component {
 }
 
 class CalculateScreen extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {peso: '', altura: '', imc: 0};
   }
-
-  calculateSum = () => {
+  calculateImc = () => {
     const { peso, altura } = this.state;
-
     this.setState({
-      imc: (Number(peso) / (Number(altura)*Number(altura))) * 10000
+      imc: ((Number(peso) / (Number(altura)*Number(altura))) * 10000).toFixed(2)
     });
   }
-
   static navigationOptions = {
     title: 'Calcular IMC',
     headerTintColor: 'white',
@@ -74,8 +70,6 @@ class CalculateScreen extends React.Component {
     const { navigate } = this.props.navigation;
     return(
       <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
-      <KeyboardAvoidingView behavior= 'padding' style= {styles.wrapper}>
-
         <View style={styles.textNumberContainer}>
           <TouchableOpacity style= {styles.buttonContainer}>
             <Text style= {styles.buttonText}>Peso (kg) : </Text>
@@ -89,7 +83,6 @@ class CalculateScreen extends React.Component {
             onChangeText= {(peso) => this.setState({peso})}
           />
         </View>
-
         <View style={styles.textNumberContainer}>
           <TouchableOpacity style= {styles.buttonContainer}>
             <Text style= {styles.buttonText}>Altura (cm): </Text>
@@ -103,13 +96,11 @@ class CalculateScreen extends React.Component {
             onChangeText={(altura) => this.setState({altura})}
           />
         </View>
-
         <View style={styles.btnCalculateContainer}>
-          <TouchableHighlight onPress={this.calculateSum} style={styles.buttonCalculate}>
+          <TouchableHighlight onPress={this.calculateImc} style={styles.buttonCalculate}>
             <Text style={styles.buttonTextCalculate}>Calcular</Text>
           </TouchableHighlight>
         </View>
-
          <View style={styles.textNumberContainer}>
           <TouchableOpacity style= {styles.buttonContainer}>
             <Text style= {styles.buttonText}>IMC : </Text>
@@ -117,44 +108,95 @@ class CalculateScreen extends React.Component {
           <View style= {styles.border}></View>
           <Text>{this.state.imc}</Text>
         </View>
-
-      </KeyboardAvoidingView>
-
         <View style= {styles.footer}>
-          <TouchableOpacity onPress= { ()=> navigate('Result') } style={styles.buttonResult}>
+          <TouchableOpacity onPress= { ()=> navigate('Result', {imc:this.state.imc}) } style={styles.buttonResult}>
             <Text style={styles.buttonTextFooter}>Resultados</Text>
           </TouchableOpacity>
         </View>
-
       </Image>
     );
   }
 }
 
 class ResultScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {imc: this.props.navigation.state.params.imc};
+    //console.warn('this.props.navigation.state.params',this.props.navigation.state.params.imc);
+  }
   static navigationOptions = {
-    title: 'Result',
+    title: 'Resultados',
     headerTintColor: 'white',
     headerStyle: {
         backgroundColor: '#e74c3c',
         marginTop: Expo.Constants.statusBarHeight
       },
     headerTitleStyle: {
-      padding: 70,
+      padding: 50,
       color: '#ecf0f1',
     }
   };
   render(){
     const { navigate } = this.props.navigation;
+
+    if(this.state.imc < 16)
     return(
-    <Image style= { styles.imgContainer} source= {require('./src/img/kiwi.jpg')}>
-        <TouchableOpacity onPress= { ()=> navigate('Result') }>
-          <View style={styles.button}>
-            <Text style={styles.buttonTextFooter}>Go Table</Text>
-          </View>
-        </TouchableOpacity>
-      </Image>
+    <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
+      <Text style= {styles.text}>Delgadez Severa</Text>
+    </Image>
     );
+
+
+    if((this.state.imc > 16) && (this.state.imc < 16.99))
+    return(
+    <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
+      <Text style= {styles.text}>Delgadez Moderada</Text>
+    </Image>
+    );
+
+
+    if((this.state.imc > 17) && (this.state.imc < 18.49))
+    return(
+    <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
+      <Text style= {styles.text}>Delgadez Aceptable</Text>
+    </Image>
+    );
+
+    if((this.state.imc > 18.50) && (this.state.imc < 24.99)){
+    return(
+    <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
+      <Text style= {styles.text}>Peso Normal</Text>
+    </Image>
+    );
+    }
+
+    if((this.state.imc > 25) && (this.state.imc < 29.99))
+    return(
+    <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
+      <Text style= {styles.text}>Sobrepeso</Text>
+    </Image>
+    );
+
+    if((this.state.imc > 30) && (this.state.imc < 34.99))
+    return(
+    <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
+      <Text style= {styles.text}>Obeso: Tipo I</Text>
+    </Image>
+    );
+
+    if((this.state.imc > 35) && (this.state.imc < 39.99))
+    return(
+    <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
+      <Text style= {styles.text}>Obeso: Tipo II</Text>
+    </Image>
+    );
+
+    if(this.state.imc > 40)
+    return(
+    <Image style= { styles.imgContainer} source= {require('./src/img/white.jpg')}>
+      <Text style= {styles.text}>Obeso: Tipo III</Text>
+    </Image>
+  );
   }
 }
 
